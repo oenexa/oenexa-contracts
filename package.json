@@ -1,0 +1,16 @@
+{
+  "name": "@oenexa/contracts",
+  "version": "1.0.0",
+  "description": "OENEXA Sovereign Layer 1 Smart Contracts (Native ONXC, Quantum Shielded Pool, Atomic Escrow, Staking)",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
