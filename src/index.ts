@@ -1,2 +1,5 @@
-export * from './contracts/OnxcToken.js';
-export * from './contracts/QuantumShieldedPool.js';
+export * from './contracts/OnxcToken';
+export * from './contracts/QuantumShieldedPool';
+export * from './contracts/OenexaEscrow';
+export * from './contracts/OenexaLiquidityPool';
+export * from './contracts/OenexaUSD';
