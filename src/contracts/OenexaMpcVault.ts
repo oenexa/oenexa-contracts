@@ -20,6 +20,7 @@ export class OenexaMpcVault {
   public paused: boolean = false;
   private proposals = new Map<string, WithdrawalProposalData>();
   private nativeBalance: bigint = 0n;
+  private tokenBalances = new Map<string, bigint>();
 
   constructor(kms: string, coSigner: string, recovery: string) {
     if (!kms || !coSigner || !recovery) throw new Error('Invalid signers');
@@ -41,8 +42,18 @@ export class OenexaMpcVault {
     this.nativeBalance += amount;
   }
 
+  public depositToken(token: string, amount: bigint): void {
+    if (amount <= 0n) throw new Error('Amount must be > 0');
+    const tokenKey = token.toLowerCase();
+    this.tokenBalances.set(tokenKey, (this.tokenBalances.get(tokenKey) || 0n) + amount);
+  }
+
   public getNativeBalance(): bigint {
     return this.nativeBalance;
+  }
+
+  public getTokenBalance(token: string): bigint {
+    return this.tokenBalances.get(token.toLowerCase()) || 0n;
   }
 
   public proposeWithdrawal(params: {
@@ -114,6 +125,10 @@ export class OenexaMpcVault {
     if (proposal.token === '0x0000000000000000000000000000000000000000') {
       if (this.nativeBalance < proposal.amount) throw new Error('Insufficient vault native balance');
       this.nativeBalance -= proposal.amount;
+    } else {
+      const currentTokenBal = this.getTokenBalance(proposal.token);
+      if (currentTokenBal < proposal.amount) throw new Error('Insufficient vault token balance');
+      this.tokenBalances.set(proposal.token, currentTokenBal - proposal.amount);
     }
 
     proposal.executed = true;

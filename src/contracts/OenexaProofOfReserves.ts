@@ -44,6 +44,9 @@ export class OenexaProofOfReserves {
     if (this.epochSet.has(params.epochId)) {
       throw new Error('Epoch already recorded');
     }
+    if (!params.merkleRoot || params.merkleRoot === '0x' || params.merkleRoot === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+      throw new Error('Invalid Merkle root');
+    }
     if (params.totalLiabilitiesUSD <= 0n) {
       throw new Error('Liabilities must be > 0');
     }

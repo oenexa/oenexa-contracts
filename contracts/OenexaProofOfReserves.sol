@@ -63,6 +63,7 @@ contract OenexaProofOfReserves {
         bytes calldata auditorSignature
     ) external onlyAuditorOrOwner {
         require(!epochExists[epochId], "Epoch already recorded");
+        require(merkleRoot != bytes32(0), "Invalid Merkle root");
         require(totalLiabilitiesUSD > 0, "Liabilities must be > 0");
         require(totalReservesUSD >= totalLiabilitiesUSD, "Reserves must cover 100% of liabilities");
 

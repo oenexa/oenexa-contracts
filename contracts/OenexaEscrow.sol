@@ -8,7 +8,7 @@ interface IERC20 {
 
 /**
  * @title OenexaEscrow
- * @notice Multi-party escrow for OENGO on-demand quick commerce deliveries.
+ * @notice Multi-party escrow for OENEXA on-demand peer-to-peer commerce and settlements.
  * Holds customer deposit, allows merchant acceptance, driver assignment,
  * and atomic settlement on cryptographic proof of delivery.
  */

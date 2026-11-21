@@ -114,6 +114,11 @@ contract OenexaMpcVault {
         if (proposal.token == address(0)) {
             (bool success, ) = payable(proposal.destination).call{value: proposal.amount}("");
             require(success, "Native transfer failed");
+        } else {
+            (bool success, bytes memory data) = proposal.token.call(
+                abi.encodeWithSignature("transfer(address,uint256)", proposal.destination, proposal.amount)
+            );
+            require(success && (data.length == 0 || abi.decode(data, (bool))), "Token transfer failed");
         }
 
         emit ProposalExecuted(_proposalId, proposal.destination, proposal.amount);

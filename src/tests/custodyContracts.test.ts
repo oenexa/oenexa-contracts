@@ -83,6 +83,21 @@ describe('Oenexa Custody & Solvency Smart Contracts Suite', () => {
       ).toThrow('Epoch already recorded');
     });
 
+    it('rejects invalid or zero Merkle root in attestation', () => {
+      const por = new OenexaProofOfReserves(auditor, owner);
+
+      expect(() =>
+        por.publishAttestation({
+          caller: auditor,
+          epochId: 104,
+          merkleRoot: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          totalLiabilitiesUSD: 100_000_000n,
+          totalReservesUSD: 105_000_000n,
+          auditorSignature: '0xsig',
+        })
+      ).toThrow('Invalid Merkle root');
+    });
+
     it('cryptographically verifies Merkle inclusion proofs', () => {
       const leaf1 = '0x' + createHash('sha256').update('user1:asset:100:salt1').digest('hex');
       const leaf2 = '0x' + createHash('sha256').update('user2:asset:200:salt2').digest('hex');
@@ -179,6 +194,24 @@ describe('Oenexa Custody & Solvency Smart Contracts Suite', () => {
       const executed = vault.executeWithdrawal(kmsSigner, proposalId, now + 86410);
       expect(executed).toBe(true);
       expect(vault.getNativeBalance()).toBe(75_000n * 10n ** 18n);
+    });
+
+    it('executes ERC-20 token withdrawal correctly', () => {
+      const vault = new OenexaMpcVault(kmsSigner, coSigner, recoverySigner);
+      const tokenAddress = '0x1234567890123456789012345678901234567890';
+      vault.depositToken(tokenAddress, 50_000n * 10n ** 6n);
+
+      const proposalId = vault.proposeWithdrawal({
+        caller: kmsSigner,
+        destination,
+        amount: 1_000n * 10n ** 6n,
+        token: tokenAddress,
+      });
+
+      vault.approveProposal(coSigner, proposalId);
+      const success = vault.executeWithdrawal(kmsSigner, proposalId);
+      expect(success).toBe(true);
+      expect(vault.getTokenBalance(tokenAddress)).toBe(49_000n * 10n ** 6n);
     });
 
     it('prevents double approvals from the same signer', () => {
